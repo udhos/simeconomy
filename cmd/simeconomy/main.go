@@ -31,11 +31,15 @@ func main() {
 
 	for {
 		fmt.Println()
-		fmt.Printf("day: %d\npopulation: %d\nmoney: %d\ngoods: %d\n",
+		pop, farmers, merchants := w.populationSize()
+		fmt.Printf("day: %d\npopulation: %d\nfarmers: %d\nmerchants: %d\nmoney: %d\ngoods: %d\nfood: %d\n",
 			w.day,
-			w.populationSize(),
+			pop,
+			farmers,
+			merchants,
 			w.money(),
-			w.amountOfGoods())
+			w.amountOfGoods(),
+			w.amountOfFood())
 		fmt.Print("\ncommand> ")
 		text, errRead := reader.ReadString('\n')
 		if errRead != nil {

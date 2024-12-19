@@ -46,6 +46,6 @@ func cmdQuit(_ *world) {
 }
 
 func cmdRun(w *world) {
-	w.day++
+	w.run()
 	fmt.Println("simulation step executed")
 }

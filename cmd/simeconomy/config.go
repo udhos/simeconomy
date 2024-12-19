@@ -9,8 +9,15 @@ import (
 )
 
 type config struct {
-	InitialPopulation int `yaml:"initial_population"`
-	InitialMoney      int `yaml:"initial_money"`
+	InitialPopulation         int     `yaml:"initial_population"`
+	InitialMoney              int     `yaml:"initial_money"`
+	InitialFarmers            int     `yaml:"initial_farmers"`
+	InitialMerchants          int     `yaml:"initial_merchants"`
+	FruitDuration             int     `yaml:"fruit_duration"`
+	DailyMeals                int     `yaml:"daily_meals"`
+	FarmerProduction          int     `yaml:"farmer_production"`
+	FarmerInitialPrice        int     `yaml:"farmer_initial_price"`
+	MerchantInitialSellFactor float32 `yaml:"merchant_initial_sell_factor"`
 }
 
 func loadConfig(configFile string) config {
