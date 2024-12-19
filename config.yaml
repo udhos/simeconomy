@@ -1,9 +1,10 @@
 initial_population: 1000
 initial_money: 1000
-initial_farmers: 5
-initial_merchants: 5
+initial_farmers: 30
+initial_merchants: 20
+merchant_capacity: 200
 fruit_duration: 10
 daily_meals: 3
-farmer_production: 10
+farmer_production: 110
 farmer_initial_price: 5
 merchant_initial_sell_factor: 2.0

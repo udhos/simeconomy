@@ -18,6 +18,7 @@ type config struct {
 	FarmerProduction          int     `yaml:"farmer_production"`
 	FarmerInitialPrice        int     `yaml:"farmer_initial_price"`
 	MerchantInitialSellFactor float32 `yaml:"merchant_initial_sell_factor"`
+	MerchantCapacity          int     `yaml:"merchant_capacity"`
 }
 
 func loadConfig(configFile string) config {

@@ -28,7 +28,7 @@ func newWorld(cfg config) *world {
 			sellFactor[j] = cfg.MerchantInitialSellFactor
 		}
 		w.population[i].mercant = merchantShop{
-			capacity:   100,
+			capacity:   cfg.MerchantCapacity,
 			sellFactor: sellFactor,
 		}
 
@@ -140,6 +140,10 @@ func (p *person) merchantBuy(w *world) {
 	// scan sellers
 	for _, f := range haveFood {
 		for _, g := range f.goods {
+			if want < 1 {
+				return // no capacity
+			}
+
 			if g.kind != goodTypeFood {
 				continue
 			}
@@ -149,6 +153,8 @@ func (p *person) merchantBuy(w *world) {
 			}
 
 			// do transaction
+
+			// FIXME XXX TODO should somehow affect farmer price
 
 			buyMoney -= f.farmerPrice
 			p.money -= f.farmerPrice
@@ -186,14 +192,19 @@ func (w *world) rot() {
 }
 
 func (w *world) eat() {
-	var ate, hungry int
+	var ate, hungry, bought, noMoney int
 	for _, p := range w.population {
-		a, h := p.eat(w)
+		a, h, b, nm := p.eat(w)
 		ate += a
 		hungry += h
+		bought += b
+		if nm {
+			noMoney++
+		}
 	}
 
-	fmt.Printf("population meals: meals eaten %d, meals missed: %d\n", ate, hungry)
+	fmt.Printf("population meals: meals eaten=%d bought=%d no_money=%d missed=%d\n",
+		ate, bought, noMoney, hungry)
 }
 
 func (w *world) removeGood(old *good) {
@@ -281,7 +292,8 @@ func (p *person) removeGood(old *good) {
 	}
 }
 
-func (p *person) eat(w *world) (ate, hungry int) {
+func (p *person) eat(w *world) (ate, hungry, bought int, noMoney bool) {
+NEXT_MEAL:
 	for range w.cfg.DailyMeals {
 		if f, found := p.pickFood(); found {
 			w.removeGood(f)
@@ -290,8 +302,70 @@ func (p *person) eat(w *world) (ate, hungry int) {
 			continue
 		}
 
-		// FIXME TODO XXX eat - try to buy
-		panic("FIXME TODO XXX eat - try to buy")
+		// try to buy
+
+		// find merchants
+		var merchants []*person
+		for _, p := range w.population {
+			if p.job != personJobMerchant {
+				continue
+			}
+			var haveFood bool
+			for _, item := range p.mercant.items {
+				if item.item.kind == goodTypeFood {
+					haveFood = true
+					break
+				}
+			}
+			if !haveFood {
+				continue
+			}
+			merchants = append(merchants, p)
+		}
+		// shuffle
+		rand.Shuffle(len(merchants), func(i, j int) {
+			merchants[i], merchants[j] = merchants[j], merchants[i]
+		})
+		// pick three
+		if len(merchants) > 3 {
+			merchants = merchants[:3]
+		}
+
+		// FIXME TODO XXX should sort merchants by lowest price first?
+
+		var lowMoney int
+
+		// scan merchants
+		for _, seller := range merchants {
+			for _, item := range seller.mercant.items {
+				if item.item.kind != goodTypeFood {
+					continue // not a food
+				}
+				// found food
+				price := int(float32(item.buyPrice) * seller.mercant.sellFactor[item.item.kind-1])
+				if p.money < price {
+					lowMoney++
+					continue // not enough money
+				}
+				// able to pay
+
+				// FIXME TODO XXX should affect merchant sellFactor
+
+				p.money -= price
+				seller.money += price
+
+				seller.removeGood(item.item)
+				w.removeGood(item.item)
+
+				bought++
+				ate++
+				continue NEXT_MEAL
+			}
+		}
+
+		if lowMoney > 0 {
+			noMoney = true
+		}
 
 		hungry++
 	}
