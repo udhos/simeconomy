@@ -212,13 +212,11 @@ func (w *world) eat() {
 		ate += a
 		hungry += h
 		bought += b
-		if nm {
-			noMoney++
-		}
+		noMoney += nm
 	}
 
-	fmt.Printf("population meals: meals eaten=%d bought=%d no_money=%d missed=%d\n",
-		ate, bought, noMoney, hungry)
+	fmt.Printf("population meals: meals wanted=%d eaten=%d bought=%d no_money=%d missed=%d\n",
+		ate+hungry, ate, bought, noMoney, hungry)
 }
 
 func (w *world) removeGood(old *good) {
@@ -306,7 +304,7 @@ func (p *person) removeGood(old *good) {
 	}
 }
 
-func (p *person) eat(w *world) (ate, hungry, bought int, noMoney bool) {
+func (p *person) eat(w *world) (ate, hungry, bought, noMoney int) {
 NEXT_MEAL:
 	for range w.cfg.DailyMeals {
 		if f, found := p.pickFood(); found {
@@ -378,7 +376,7 @@ NEXT_MEAL:
 		}
 
 		if lowMoney > 0 {
-			noMoney = true
+			noMoney++
 		}
 
 		hungry++
