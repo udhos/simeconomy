@@ -32,14 +32,17 @@ func main() {
 	for {
 		fmt.Println()
 		pop, farmers, merchants := w.populationSize()
-		fmt.Printf("day: %d\npopulation: %d\nfarmers: %d\nmerchants: %d\nmoney: %d\ngoods: %d\nfood: %d\n",
+		richest, poorest := w.wealth()
+		fmt.Printf("day: %d\npopulation: %d\nfarmers: %d\nmerchants: %d\nmoney: %d\ngoods: %d\nfood: %d\nrichest: %d\npoorest: %d\n",
 			w.day,
 			pop,
 			farmers,
 			merchants,
 			w.money(),
 			w.amountOfGoods(),
-			w.amountOfFood())
+			w.amountOfFood(),
+			richest,
+			poorest)
 		fmt.Print("\ncommand> ")
 		text, errRead := reader.ReadString('\n')
 		if errRead != nil {

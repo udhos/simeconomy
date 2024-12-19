@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand/v2"
 )
 
@@ -55,6 +56,19 @@ func (w world) populationSize() (population, farmers, merchants int) {
 		}
 	}
 	population = len(w.population)
+	return
+}
+
+func (w world) wealth() (richest, poorest int) {
+	poorest = math.MaxInt
+	for _, p := range w.population {
+		if p.money > richest {
+			richest = p.money
+		}
+		if p.money < poorest {
+			poorest = p.money
+		}
+	}
 	return
 }
 
